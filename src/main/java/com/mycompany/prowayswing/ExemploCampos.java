@@ -137,6 +137,11 @@ public class ExemploCampos extends javax.swing.JFrame {
         jScrollPane2.setViewportView(jTable1);
 
         jButtonApagar.setText("Apagar");
+        jButtonApagar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonApagarActionPerformed(evt);
+            }
+        });
 
         jButtonEditar.setText("Editar");
         jButtonEditar.addActionListener(new java.awt.event.ActionListener() {
@@ -296,7 +301,7 @@ public class ExemploCampos extends javax.swing.JFrame {
             descricao
         });
         salvarNoExcel();
-        
+
         JOptionPane.showMessageDialog(null, "Cadastrado com sucesso");
     }//GEN-LAST:event_jButtonProcessarActionPerformed
 
@@ -390,6 +395,13 @@ public class ExemploCampos extends javax.swing.JFrame {
     private void jButtonEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEditarActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButtonEditarActionPerformed
+
+    private void jButtonApagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonApagarActionPerformed
+        var modelo = (DefaultTableModel) jTable1.getModel();
+        var indiceLinhaSelecionada = jTable1.getSelectedRow();
+        modelo.removeRow(indiceLinhaSelecionada);
+        salvarNoExcel();
+    }//GEN-LAST:event_jButtonApagarActionPerformed
 
     /**
      * @param args the command line arguments
