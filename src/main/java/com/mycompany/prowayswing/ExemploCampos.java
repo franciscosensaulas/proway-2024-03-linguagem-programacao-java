@@ -4,7 +4,15 @@
  */
 package com.mycompany.prowayswing;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Paths;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  *
@@ -112,15 +120,20 @@ public class ExemploCampos extends javax.swing.JFrame {
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Nome", "Sobrenome", "Mês Nascimento", "Ano Nascimento", "Área Atuação", "Sexo", "Descrição"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane2.setViewportView(jTable1);
 
         jButtonApagar.setText("Apagar");
@@ -138,10 +151,10 @@ public class ExemploCampos extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(6, 6, 6)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabelNome)
-                        .addGap(746, 746, 746)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButtonEditar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButtonApagar))
@@ -176,10 +189,11 @@ public class ExemploCampos extends javax.swing.JFrame {
                                 .addGap(194, 194, 194)
                                 .addComponent(jButtonCancelar)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButtonProcessar)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 560, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jCheckBoxTermosAceite, javax.swing.GroupLayout.PREFERRED_SIZE, 402, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(jButtonProcessar))
+                            .addComponent(jCheckBoxTermosAceite, javax.swing.GroupLayout.PREFERRED_SIZE, 402, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 694, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -226,16 +240,14 @@ public class ExemploCampos extends javax.swing.JFrame {
                         .addGap(6, 6, 6)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(8, 8, 8)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 440, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(392, 392, 392)
                         .addComponent(jCheckBoxTermosAceite)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jButtonProcessar)
-                            .addComponent(jButtonCancelar))))
-                .addGap(1, 1, 1))
+                            .addComponent(jButtonCancelar)))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 440, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(4, 4, 4))
         );
 
         pack();
@@ -244,50 +256,116 @@ public class ExemploCampos extends javax.swing.JFrame {
     private void jButtonProcessarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonProcessarActionPerformed
         // get => obter algo;
         // set => definir algo
-        
+
         // Obter o nome que o usuário digitou do campo de texto(jTextField1)
         String nome = jTextFieldNome.getText();
         // Obter o sobrenome que o usuário digitou do campo de texto(jTextField2)
         String sobrenome = jTextFieldSobrenome.getText();
-        
+
         // Obter o mês de nascimento selecionado do comboBox
-        String mesNascimetno = (String) jComboBoxMesNascimento.getSelectedItem();
+        String mesNascimento = (String) jComboBoxMesNascimento.getSelectedItem();
         int anoNascimento = Integer.parseInt(jSpinnerAnoNascimento.getValue().toString());
         String sexo = "";
-        if (jRadioButtonSexoFeminino.isSelected() == true){
+        if (jRadioButtonSexoFeminino.isSelected() == true) {
             sexo = "Feminino";
-        }else if(jRadioButtonSexoMasculino.isSelected() == true){
+        } else if (jRadioButtonSexoMasculino.isSelected() == true) {
             sexo = "Masculino";
         }
-        
+
         boolean ehBackEnd = jCheckBoxAreaAtuacaoBackEnd.isSelected();
         boolean ehFrontEnd = jCheckBoxAreaAtuacaoFrontEnd.isSelected();
         String descricao = jTextAreaDescricao.getText();
         String nomeCompleto = nome + " " + sobrenome;
-        String mensagem = "Nome completo: "  + nomeCompleto +
-                "\nAno Nascimento: " + anoNascimento + 
-                        "\nSexo: " + sexo + 
-                        "\nFront-end: " + getTextoBoolean(ehFrontEnd) + 
-                        "\nBack-end: " + getTextoBoolean(ehBackEnd) + 
-                        "\nDescrição: " + descricao;
-        JOptionPane.showMessageDialog(null, mensagem);
+
+        String areaAtuacao = "Full Stack";
+        if (ehBackEnd == true && ehFrontEnd == false) {
+            areaAtuacao = "Back-End";
+        } else if (ehBackEnd == false && ehFrontEnd == true) {
+            areaAtuacao = "Front-End";
+        }
+
+        var modeloTabela = (DefaultTableModel) jTable1.getModel();
+
+        modeloTabela.addRow(new Object[]{
+            nome,
+            sobrenome,
+            mesNascimento,
+            anoNascimento,
+            areaAtuacao,
+            sexo,
+            descricao
+        });
+        salvarNoExcel();
+        
+        JOptionPane.showMessageDialog(null, "Cadastrado com sucesso");
     }//GEN-LAST:event_jButtonProcessarActionPerformed
 
-    private String getTextoBoolean(boolean value){
-        if (value == true){
-            return "Sim";
+    private void salvarNoExcel() {
+        var modelo = (DefaultTableModel) jTable1.getModel();
+
+        try (Workbook excel = new XSSFWorkbook()) {
+            Sheet planilha = excel.createSheet("Colaboradores");
+
+            Row linhaCabecalho = planilha.createRow(0);
+            linhaCabecalho.createCell(0).setCellValue("Nome");
+            linhaCabecalho.createCell(1).setCellValue("Sobrenome");
+            linhaCabecalho.createCell(2).setCellValue("Mês Nascimento");
+            linhaCabecalho.createCell(3).setCellValue("Ano Nascimento");
+            linhaCabecalho.createCell(4).setCellValue("Área de Atuação");
+            linhaCabecalho.createCell(5).setCellValue("Sexo");
+            linhaCabecalho.createCell(6).setCellValue("Descrição");
+            // Pegar o modelo da tabela
+
+            // Percorrer cada uma das linhas da tabela
+            for (var i = 0; i < modelo.getRowCount(); i++) {
+                // Obter o nome do produto da linha iterada
+                String nome = modelo.getValueAt(i, 0).toString();
+                String sobrenome = modelo.getValueAt(i, 1).toString();
+                String mesNascimento = modelo.getValueAt(i, 2).toString();
+                String anoNascimento = modelo.getValueAt(i, 3).toString();
+                String areaAtuacao = modelo.getValueAt(i, 4).toString();
+                String sexo = modelo.getValueAt(i, 5).toString();
+                String descricao = modelo.getValueAt(i, 6).toString();
+                // Criar uma linha na planilha
+                Row linha = planilha.createRow(i + 1);
+                // Criar uma célula definindo o nome do produto da linha iterada
+                linha.createCell(0).setCellValue(nome);
+                linha.createCell(1).setCellValue(sobrenome);
+                linha.createCell(2).setCellValue(mesNascimento);
+                linha.createCell(3).setCellValue(anoNascimento);
+                linha.createCell(4).setCellValue(areaAtuacao);
+                linha.createCell(5).setCellValue(sexo);
+                linha.createCell(6).setCellValue(descricao);
+            }
+
+            // Obter o caminho da pasta da área de trabalho do usuário
+            var caminhoDesktop = Paths.get(
+                    System.getProperty("user.home"), "Desktop");
+            // Obter o caminho do arquivo do excel que será importado
+            var caminhoArquivo = caminhoDesktop.resolve("example.xlsx");
+
+            FileOutputStream arquivoSaida = new FileOutputStream(caminhoArquivo.toFile());
+            excel.write(arquivoSaida);
+            arquivoSaida.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        else{
+    }
+
+    private String getTextoBoolean(boolean value) {
+        if (value == true) {
+            return "Sim";
+        } else {
             return "Não";
         }
     }
-    
+
     private void jCheckBoxTermosAceiteItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBoxTermosAceiteItemStateChanged
         boolean termosDeAcordoAceitos = jCheckBoxTermosAceite.isSelected();
-        
-        if (termosDeAcordoAceitos == true){
+
+        if (termosDeAcordoAceitos == true) {
             jButtonProcessar.setEnabled(true);
-        }else{
+        } else {
             jButtonProcessar.setEnabled(false);
         }
     }//GEN-LAST:event_jCheckBoxTermosAceiteItemStateChanged
@@ -296,14 +374,14 @@ public class ExemploCampos extends javax.swing.JFrame {
         jTextFieldNome.setText("");
         jTextFieldSobrenome.setText("");
         jTextAreaDescricao.setText("");
-        
+
         jCheckBoxAreaAtuacaoBackEnd.setSelected(false);
         jCheckBoxAreaAtuacaoFrontEnd.setSelected(false);
         jCheckBoxTermosAceite.setSelected(false);
-        
+
         // Remover a selação do radio button
         buttonGroup1.clearSelection();
-        
+
         jSpinnerAnoNascimento.setValue(2024);
         // Definir o indice 0 dos itens do mês de nascimento, ou seja, janeiro.
         jComboBoxMesNascimento.setSelectedIndex(0);
